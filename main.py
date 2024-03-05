@@ -29,3 +29,23 @@ def update_points(num, pts, bankpts):
     if num % 10 in (0, 5):
         bankpts += 1
     return pts, bankpts
+
+def choose_next_node(num, pts, bankpts):
+    divisors = check_possible_divisors(num)
+    nodes = []
+    for d in divisors:
+        newnum = num / d
+        newpts, newbankpts = update_points(newnum, pts, bankpts)
+        nodes.append(Node(newnum, newpts, newbankpts))
+
+
+class Node():
+    def __init__(self, num, pts, bankpts, value=0):
+        self.num = num
+        self.pts = pts
+        self.bankpts = bankpts
+        self.value = value
+
+choose_next_node(60,0,0)
+
+

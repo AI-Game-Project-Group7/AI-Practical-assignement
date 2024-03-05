@@ -2,13 +2,9 @@ import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QWidget, QStackedWidget, QVBoxLayout
 from PyQt5.QtGui import QFont
 from main import *
+from state import State
 
-points = 0
-bankpoints = 0
-num = 50000
-
-
-
+state = State(50000)
 
 class Window(QMainWindow):
     def __init__(self):
@@ -16,8 +12,8 @@ class Window(QMainWindow):
         self.points = 0
         self.bankpoints = 0
         self.stacked_widget = QStackedWidget(self)
-        self.startscreen = StartScreen(self.stacked_widget)
         self.gamescreen = GameScreen(self.stacked_widget)
+        self.startscreen = StartScreen(self.stacked_widget, self.gamescreen)
         self.endscreen = EndScreen(self.stacked_widget)
         self.stacked_widget.addWidget(self.startscreen)
         self.stacked_widget.addWidget(self.gamescreen)
@@ -30,19 +26,30 @@ class Window(QMainWindow):
 
 # insert styles for the game starting screen here
 class StartScreen(QWidget):
-    def __init__(self, stacked_widget):
+    def __init__(self, stacked_widget, gamescreen):
         super().__init__()
         self.stacked_widget = stacked_widget
+        self.gamescreen = gamescreen
         self.label = QLabel("Choose a starting number", self)
         self.label.setGeometry(150, 50, 350, 50)
         self.label.setFont(QFont('Arial', 20))
-        numbers = generate_randoms()
-        for i in range(len(numbers)):
-            self.button = QPushButton(str(numbers[i]), self)
+        self.numbers = generate_randoms()
+        for i in range(len(self.numbers)):
+            self.button = QPushButton(str(self.numbers[i]), self)
             self.button.setGeometry(30 + 110 * i, 150, 100, 40)
+            self.button.clicked.connect(lambda: self.on_numbutton_click(i))
         self.startbutton = QPushButton("Start", self)
         self.startbutton.setGeometry(200, 300, 200, 80)
-        self.startbutton.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(1)) # Insert a function that set "num" and update widget
+        self.startbutton.clicked.connect(self.on_startbutton_click) # Insert a function that set "num" and update widget
+    # doesnt work for now
+    def on_numbutton_click(self, i):
+        self.chosen_number = self.numbers[i]
+        print(self.chosen_number)
+
+    def on_startbutton_click(self):
+        if self.chosen_number:
+            self.gamescreen.update_labels()
+            self.stacked_widget.setCurrentIndex(1)
 
 
 # insert styles for the game main screen here
@@ -50,35 +57,32 @@ class GameScreen(QWidget):
     def __init__(self, stacked_widget):
         super().__init__()
         self.stacked_widget = stacked_widget
-
         '''Adding text about num, points, bankpoints and player currently playing. Needs to be updated every time there is a change'''
         # Num
-        self.label = QLabel("number : " + str(num), self)
-        self.label.setGeometry(150, 50, 350, 50)
-        self.label.setFont(QFont('Arial', 20))
+        self.nlabel = QLabel("number : " + str(state.num), self)
+        self.nlabel.setGeometry(150, 50, 350, 50)
+        self.nlabel.setFont(QFont('Arial', 20))
 
         # Points
-        self.label = QLabel("points : " + str(points), self)
-        self.label.setGeometry(150, 50 + 25, 350, 50)
-        self.label.setFont(QFont('Arial', 20))
+        self.plabel = QLabel("points : " + str(state.pts), self)
+        self.plabel.setGeometry(150, 50 + 25, 350, 50)
+        self.plabel.setFont(QFont('Arial', 20))
 
         # Bankpoints
-        self.label = QLabel("bankpoints : " + str(bankpoints), self)
-        self.label.setGeometry(150, 50 + 50, 350, 50)
-        self.label.setFont(QFont('Arial', 20))
+        self.blabel = QLabel("bankpoints : " + str(state.bankpts), self)
+        self.blabel.setGeometry(150, 50 + 50, 350, 50)
+        self.blabel.setFont(QFont('Arial', 20))
 
         # Player
         self.label = QLabel("player : " + str(1), self)
         self.label.setGeometry(150, 50 + 200, 350, 50)
         self.label.setFont(QFont('Arial', 20))
-        
 
-        # Choosing between dividing the number by its dividers  
-        dividers = check_possible_divisors(num)
-        for i in range(len(dividers)):
-            self.button = QPushButton(str(dividers[i]), self)
-            self.button.setGeometry(90 + 110 * i, 150, 100, 40)
-            self.button.clicked.connect(lambda : divid_number(self, dividers[i]))
+    # updates values on labels
+    def update_labels(self):
+        self.nlabel.setText("number : " + str(state.num))
+        self.plabel.setText("points : " + str(state.pts))
+        self.blabel.setText("bankpoints : " + str(state.bankpts))
 
 
 def divid_number(self, divider):
@@ -105,7 +109,7 @@ class EndScreen(QWidget):
         super().__init__()
         self.stacked_widget = stacked_widget
         label = QLabel("", self)
-        if points % 2:
+        if state.pts % 2:
             label.setText("First player wins!")
         else:
             label.setText("Second player wins!")
