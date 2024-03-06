@@ -34,16 +34,20 @@ class StartScreen(QWidget):
         self.label.setGeometry(150, 50, 350, 50)
         self.label.setFont(QFont('Arial', 20))
         self.numbers = generate_randoms()
+
+        # Add 5 buttons with numbers to choose from
         for i in range(len(self.numbers)):
             self.button = QPushButton(str(self.numbers[i]), self)
             self.button.setGeometry(30 + 110 * i, 150, 100, 40)
-            self.button.clicked.connect(lambda: self.on_numbutton_click(i))
+            self.button.clicked.connect(lambda _, index=i: self.on_numbutton_click(index))
+
         self.startbutton = QPushButton("Start", self)
         self.startbutton.setGeometry(200, 300, 200, 80)
-        self.startbutton.clicked.connect(self.on_startbutton_click) # Insert a function that set "num" and update widget
-    # doesnt work for now
+        self.startbutton.clicked.connect(self.on_startbutton_click)
+
     def on_numbutton_click(self, i):
         self.chosen_number = self.numbers[i]
+        state.num = self.chosen_number
         print(self.chosen_number)
 
     def on_startbutton_click(self):
@@ -91,7 +95,7 @@ def divid_number(self, divider):
     global bankpoints
     num  = num / divider
     points, bankpoints = update_points(num, points, bankpoints)
-    self.repaint()
+    update_labels()
     dividers = check_possible_divisors(num)
     if dividers == []:
         self.stacked_widget.setCurrentIndex(2)
