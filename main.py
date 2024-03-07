@@ -37,7 +37,11 @@ def choose_next_node(num, pts, bankpts):
         newnum = num / d
         newpts, newbankpts = update_points(newnum, pts, bankpts)
         nodes.append(Node(newnum, newpts, newbankpts))
-    picked_node = hef(nodes)
+    if not nodes:
+        return 0
+    else:
+        picked_node = hef(nodes)
+    return picked_node
 
 
 def hef(nodes):

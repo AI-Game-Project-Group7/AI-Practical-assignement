@@ -1,5 +1,7 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QWidget, QStackedWidget, QVBoxLayout
+import time
+from PyQt5.QtCore import QTimer
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QWidget, QStackedWidget
 from PyQt5.QtGui import QFont
 from main import *
 from state import State
@@ -49,12 +51,11 @@ class StartScreen(QWidget):
     def on_numbutton_click(self, i):
         self.chosen_number = self.numbers[i]
         state.num = self.chosen_number
-        print(self.chosen_number)
 
     def on_startbutton_click(self):
         if self.chosen_number:
-            self.gamescreen.update_labels()
             self.stacked_widget.setCurrentIndex(1)
+            self.gamescreen.start()
         else:
             #insert warning/error message here
             pass
@@ -65,6 +66,8 @@ class GameScreen(QWidget):
     def __init__(self, stacked_widget):
         super().__init__()
         self.stacked_widget = stacked_widget
+        self.running = True
+        self.starts = "p"
         '''Adding text about num, points, bankpoints and player currently playing. Needs to be updated every time there is a change'''
         # Num
         self.nlabel = QLabel("number : " + str(state.num), self)
@@ -82,9 +85,52 @@ class GameScreen(QWidget):
         self.blabel.setFont(QFont('Arial', 20))
 
         # Player
-        self.label = QLabel("player : " + str(1), self)
+        self.label = QLabel("player turn", self)
         self.label.setGeometry(150, 50 + 200, 350, 50)
         self.label.setFont(QFont('Arial', 20))
+
+    def start(self):
+        if self.starts == "p":
+            self.player_move()
+        else:
+            self.computer_move()
+
+    def player_move(self):
+        self.label.setText("player turn")
+        self.update_labels()
+        self.update_divisors()
+
+    def computer_move(self):
+        node = choose_next_node(state.num, state.pts, state.bankpts)
+        if not node:
+            self.stacked_widget.setCurrentIndex(2)
+        else:
+            state.num, state.pts, state.bankpts = node.num, node.pts, node.bankpts
+            for db in self.divbuttons:
+                db.deleteLater()
+            self.player_move()
+
+    def on_divbutton_clicked(self, divisor):
+        state.num = state.num / divisor
+        state.pts, state.bankpts = update_points(state.num, state.pts, state.bankpts)
+        for db in self.divbuttons:
+            db.deleteLater()
+        self.update_labels()
+        self.update_divisors()
+        self.label.setText("computer turn")
+        QTimer.singleShot(3000, self.computer_move)
+
+    def update_divisors(self):
+        self.divbuttons = []
+        divisors = check_possible_divisors(state.num)
+        if not divisors:
+            QTimer.singleShot(3000, lambda: self.stacked_widget.setCurrentIndex(2))
+        for div in divisors:
+            self.divbutton = QPushButton(str(div), self)
+            self.divbutton.setGeometry(400, 50 + 50 * div, 80, 30)
+            self.divbutton.clicked.connect(lambda _, index=div: self.on_divbutton_clicked(index))
+            self.divbuttons.append(self.divbutton)
+            self.divbutton.show()
 
     # updates values on labels
     def update_labels(self):
@@ -118,9 +164,9 @@ class EndScreen(QWidget):
         self.stacked_widget = stacked_widget
         label = QLabel("", self)
         if state.pts % 2:
-            label.setText("First player wins!")
-        else:
             label.setText("Second player wins!")
+        else:
+            label.setText("First player wins!")
         label.setGeometry(150, 50, 350, 50)
         label.setFont(QFont('Arial', 20))
         newgamebutton = QPushButton("New game", self)
