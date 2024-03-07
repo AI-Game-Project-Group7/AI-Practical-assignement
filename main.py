@@ -37,6 +37,13 @@ def choose_next_node(num, pts, bankpts):
         newnum = num / d
         newpts, newbankpts = update_points(newnum, pts, bankpts)
         nodes.append(Node(newnum, newpts, newbankpts))
+    picked_node = hef(nodes)
+
+
+def hef(nodes):
+    # insert heuristic evaluation function here
+    # for now first node is returned
+    return nodes[0]
 
 
 class Node():

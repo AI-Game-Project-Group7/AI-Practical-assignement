@@ -33,6 +33,7 @@ class StartScreen(QWidget):
         self.label = QLabel("Choose a starting number", self)
         self.label.setGeometry(150, 50, 350, 50)
         self.label.setFont(QFont('Arial', 20))
+        self.chosen_number = 0
         self.numbers = generate_randoms()
 
         # Add 5 buttons with numbers to choose from
@@ -54,6 +55,9 @@ class StartScreen(QWidget):
         if self.chosen_number:
             self.gamescreen.update_labels()
             self.stacked_widget.setCurrentIndex(1)
+        else:
+            #insert warning/error message here
+            pass
 
 
 # insert styles for the game main screen here
@@ -88,8 +92,8 @@ class GameScreen(QWidget):
         self.plabel.setText("points : " + str(state.pts))
         self.blabel.setText("bankpoints : " + str(state.bankpts))
 
-
-def divid_number(self, divider):
+# this function is not needed
+"""def divid_number(self, divider):
     global num
     global points
     global bankpoints
@@ -98,7 +102,7 @@ def divid_number(self, divider):
     update_labels()
     dividers = check_possible_divisors(num)
     if dividers == []:
-        self.stacked_widget.setCurrentIndex(2)
+        self.stacked_widget.setCurrentIndex(2)"""
 
 
 
