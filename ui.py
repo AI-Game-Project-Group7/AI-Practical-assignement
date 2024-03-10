@@ -11,12 +11,10 @@ state = State(50000)
 class Window(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.points = 0
-        self.bankpoints = 0
         self.stacked_widget = QStackedWidget(self)
+        self.endscreen = EndScreen(self.stacked_widget)
         self.gamescreen = GameScreen(self.stacked_widget)
         self.startscreen = StartScreen(self.stacked_widget, self.gamescreen)
-        self.endscreen = EndScreen(self.stacked_widget)
         self.stacked_widget.addWidget(self.startscreen)
         self.stacked_widget.addWidget(self.gamescreen)
         self.stacked_widget.addWidget(self.endscreen)
@@ -24,6 +22,8 @@ class Window(QMainWindow):
         self.setGeometry(500, 200, 600, 500)
         self.setWindowTitle("Game demonstration")
         self.show()
+
+
 
 
 # insert styles for the game starting screen here
@@ -35,6 +35,12 @@ class StartScreen(QWidget):
         self.label = QLabel("Choose a starting number", self)
         self.label.setGeometry(150, 50, 350, 50)
         self.label.setFont(QFont('Arial', 20))
+        self.startbutton = QPushButton("Start", self)
+        self.startbutton.setGeometry(200, 300, 200, 80)
+        self.startbutton.clicked.connect(self.on_startbutton_click)
+        self.init_dynamic_attributes()
+
+    def init_dynamic_attributes(self):
         self.chosen_number = 0
         self.numbers = generate_randoms()
 
@@ -44,9 +50,6 @@ class StartScreen(QWidget):
             self.button.setGeometry(30 + 110 * i, 150, 100, 40)
             self.button.clicked.connect(lambda _, index=i: self.on_numbutton_click(index))
 
-        self.startbutton = QPushButton("Start", self)
-        self.startbutton.setGeometry(200, 300, 200, 80)
-        self.startbutton.clicked.connect(self.on_startbutton_click)
 
     def on_numbutton_click(self, i):
         self.chosen_number = self.numbers[i]
@@ -103,8 +106,8 @@ class GameScreen(QWidget):
     def computer_move(self):
         node = choose_next_node(state.num, state.pts, state.bankpts)
         if not node:
-            self.stacked_widget.setCurrentIndex(2)
             self.who_wins()
+            self.stacked_widget.setCurrentIndex(2)
         else:
             state.num, state.pts, state.bankpts = node.num, node.pts, node.bankpts
             for db in self.divbuttons:
@@ -125,8 +128,8 @@ class GameScreen(QWidget):
         self.divbuttons = []
         divisors = check_possible_divisors(state.num)
         if not divisors:
-            QTimer.singleShot(3000, lambda: self.stacked_widget.setCurrentIndex(2))
             self.who_wins()
+            QTimer.singleShot(3000, lambda: self.stacked_widget.setCurrentIndex(2))
 
         for div in divisors:
             self.divbutton = QPushButton(str(div), self)
@@ -145,32 +148,15 @@ class GameScreen(QWidget):
 
     def who_wins(self):
         print("Going through me !")
-        label = QLabel("", self)
-
-        if state.pts % 2:
-            label.setText("Second player wins!")
-        else:
+        endscreen = self.stacked_widget.widget(2)
+        #!! this label has to be removed before next game ends
+        label = QLabel("", endscreen)
+        if (state.pts + state.bankpts) % 2:
             label.setText("First player wins!")
+        else:
+            label.setText("Second player wins!")
         label.setGeometry(150, 50, 350, 50)
         label.setFont(QFont('Arial', 20))
-
-# this function is not needed
-"""def divid_number(self, divider):
-    global num
-    global points
-    global bankpoints
-    num  = num / divider
-    points, bankpoints = update_points(num, points, bankpoints)
-    update_labels()
-    dividers = check_possible_divisors(num)
-    if dividers == []:
-        self.stacked_widget.setCurrentIndex(2)"""
-
-
-
-
-
-
 
 
 # insert styles for the game end screen here
@@ -178,10 +164,6 @@ class EndScreen(QWidget):
     def __init__(self, stacked_widget):
         super().__init__()
         self.stacked_widget = stacked_widget
-
-
-
-
         newgamebutton = QPushButton("New game", self)
         newgamebutton.setGeometry(200, 300, 200, 80)
         newgamebutton.clicked.connect(lambda: self.newGame())
@@ -189,6 +171,9 @@ class EndScreen(QWidget):
 
     def newGame(self):
         state.pts = 0
+        state.bankpts = 0
+        startscreen = self.stacked_widget.widget(0)
+        startscreen.init_dynamic_attributes()
         self.stacked_widget.setCurrentIndex(0)
 
 
