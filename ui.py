@@ -104,6 +104,7 @@ class GameScreen(QWidget):
         node = choose_next_node(state.num, state.pts, state.bankpts)
         if not node:
             self.stacked_widget.setCurrentIndex(2)
+            self.who_wins()
         else:
             state.num, state.pts, state.bankpts = node.num, node.pts, node.bankpts
             for db in self.divbuttons:
@@ -111,7 +112,7 @@ class GameScreen(QWidget):
             self.player_move()
 
     def on_divbutton_clicked(self, divisor):
-        state.num = state.num / divisor
+        state.num = state.num // divisor
         state.pts, state.bankpts = update_points(state.num, state.pts, state.bankpts)
         for db in self.divbuttons:
             db.deleteLater()
@@ -125,6 +126,8 @@ class GameScreen(QWidget):
         divisors = check_possible_divisors(state.num)
         if not divisors:
             QTimer.singleShot(3000, lambda: self.stacked_widget.setCurrentIndex(2))
+            self.who_wins()
+
         for div in divisors:
             self.divbutton = QPushButton(str(div), self)
             self.divbutton.setGeometry(400, 50 + 50 * div, 80, 30)
@@ -137,6 +140,19 @@ class GameScreen(QWidget):
         self.nlabel.setText("number : " + str(state.num))
         self.plabel.setText("points : " + str(state.pts))
         self.blabel.setText("bankpoints : " + str(state.bankpts))
+
+
+
+    def who_wins(self):
+        print("Going through me !")
+        label = QLabel("", self)
+
+        if state.pts % 2:
+            label.setText("Second player wins!")
+        else:
+            label.setText("First player wins!")
+        label.setGeometry(150, 50, 350, 50)
+        label.setFont(QFont('Arial', 20))
 
 # this function is not needed
 """def divid_number(self, divider):
@@ -162,16 +178,19 @@ class EndScreen(QWidget):
     def __init__(self, stacked_widget):
         super().__init__()
         self.stacked_widget = stacked_widget
-        label = QLabel("", self)
-        if state.pts % 2:
-            label.setText("Second player wins!")
-        else:
-            label.setText("First player wins!")
-        label.setGeometry(150, 50, 350, 50)
-        label.setFont(QFont('Arial', 20))
+
+
+
+
         newgamebutton = QPushButton("New game", self)
         newgamebutton.setGeometry(200, 300, 200, 80)
-        newgamebutton.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(0))
+        newgamebutton.clicked.connect(lambda: self.newGame())
+    
+
+    def newGame(self):
+        state.pts = 0
+        self.stacked_widget.setCurrentIndex(0)
+
 
 app = QApplication(sys.argv)
 win = Window()

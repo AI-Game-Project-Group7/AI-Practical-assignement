@@ -34,7 +34,7 @@ def choose_next_node(num, pts, bankpts):
     divisors = check_possible_divisors(num)
     nodes = []
     for d in divisors:
-        newnum = num / d
+        newnum = num // d
         newpts, newbankpts = update_points(newnum, pts, bankpts)
         nodes.append(Node(newnum, newpts, newbankpts))
     if not nodes:
