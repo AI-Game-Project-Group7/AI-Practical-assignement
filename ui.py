@@ -148,15 +148,20 @@ class GameScreen(QWidget):
 
     def who_wins(self):
         print("Going through me !")
+
         endscreen = self.stacked_widget.widget(2)
-        #!! this label has to be removed before next game ends
-        label = QLabel("", endscreen)
-        if (state.pts + state.bankpts) % 2:
-            label.setText("First player wins!")
+        
+        if (state.pts % 2) == 0:
+            state.pts += state.bankpts
         else:
-            label.setText("Second player wins!")
-        label.setGeometry(150, 50, 350, 50)
-        label.setFont(QFont('Arial', 20))
+            state.pts -= state.bankpts
+
+        if (state.pts % 2) != 0: # Same as state.pts % 2 but more clear this way
+            endscreen.qlabel.setText("First player wins!")
+        else:
+            endscreen.qlabel.setText("Second player wins!")
+        endscreen.qlabel.setGeometry(150, 50, 350, 50)
+        endscreen.qlabel.setFont(QFont('Arial', 20))
 
 
 # insert styles for the game end screen here
@@ -167,6 +172,8 @@ class EndScreen(QWidget):
         newgamebutton = QPushButton("New game", self)
         newgamebutton.setGeometry(200, 300, 200, 80)
         newgamebutton.clicked.connect(lambda: self.newGame())
+
+        self.qlabel = QLabel("", self)
     
 
     def newGame(self):
