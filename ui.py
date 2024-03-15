@@ -71,7 +71,8 @@ class GameScreen(QWidget):
         self.stacked_widget = stacked_widget
         self.running = True
         self.starts = "p"
-        '''Adding text about num, points, bankpoints and player currently playing. Needs to be updated every time there is a change'''
+        
+        '''Adding text about num, points, bankpoints and player currently playing.'''
         # Num
         self.nlabel = QLabel("number : " + str(state.num), self)
         self.nlabel.setGeometry(150, 50, 350, 50)
