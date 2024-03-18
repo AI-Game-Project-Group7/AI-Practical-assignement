@@ -31,12 +31,14 @@ def update_points(num, pts, bankpts):
     return pts, bankpts
 
 def choose_next_node(num, pts, bankpts):
-    divisors = check_possible_divisors(num)
     nodes = []
+    # call this block recursively to generate game tree nodes till depth level 5
+    divisors = check_possible_divisors(num)
     for d in divisors:
         newnum = num // d
         newpts, newbankpts = update_points(newnum, pts, bankpts)
         nodes.append(Node(newnum, newpts, newbankpts))
+
     if not nodes:
         return 0
     else:
@@ -51,11 +53,25 @@ def hef(nodes):
 
 
 class Node():
-    def __init__(self, num, pts, bankpts, value=0):
+    def __init__(self, num, pts, bankpts, depth, value=0):
         self.num = num
         self.pts = pts
         self.bankpts = bankpts
         self.value = value
+        self.depth = depth
+        self.parents = []
+        self.children = []
+
+    # function which adds parent to already generated node
+    def add_parent(self, parent):
+        self.parents.append(parent)
+
+    # function which adds child to already generated node
+    def add_child(self, child):
+        self.children.append(child)
+
+
+
 
 choose_next_node(60,0,0)
 
