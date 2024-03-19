@@ -32,6 +32,7 @@ def update_points(num, pts, bankpts):
 
 def choose_next_node(num, pts, bankpts):
     nodes = []
+    # Justin and Anastasia task
     # call this block recursively to generate game tree nodes till depth level 5
     divisors = check_possible_divisors(num)
     for d in divisors:
@@ -70,6 +71,13 @@ class Node():
     def add_child(self, child):
         self.children.append(child)
 
+# Hasan, you need to complete this algorithm
+# As input, only bottom level nodes have heuristic values,
+# For other nodes initial value is 0
+def minimax(nodes):
+    # the goal is to fill self.value parameter
+    # for the potential nodes which computer may choose
+    pass
 
 
 
