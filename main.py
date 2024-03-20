@@ -48,6 +48,8 @@ def choose_next_node(num, pts, bankpts):
 
 
 def hef(nodes):
+    # abs(pts) + abs(bankpts) + numberofdivisors = odd - first players wins
+    # abs(pts) + abs(bankpts) + numberofdivisors  = even - second player wins
     # insert heuristic evaluation function here
     # for now first node is returned
     return nodes[0]
