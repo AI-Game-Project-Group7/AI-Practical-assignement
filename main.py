@@ -1,5 +1,23 @@
 from random import randint
 
+class Node():
+    def __init__(self, num, pts, bankpts, depth, value=0):
+        self.num = num
+        self.pts = pts
+        self.bankpts = bankpts
+        self.value = value
+        self.depth = depth
+        self.parents = []
+        self.children = []
+
+    # function which adds parent to already generated node
+    def add_parent(self, parent):
+        self.parents.append(parent)
+
+    # function which adds child to already generated node
+    def add_child(self, child):
+        self.children.append(child)
+
 # function to generate 5 numbers in a range from 30000 to 50000
 def generate_randoms(low=30000, high=50000, quantity=5):
     startnums = []
@@ -31,6 +49,7 @@ def update_points(num, pts, bankpts):
     return pts, bankpts
 
 #crea
+nodes = []
 def game_tree (node, depth, maxdepth=5):
     if depth >= maxdepth:
         return
@@ -40,13 +59,17 @@ def game_tree (node, depth, maxdepth=5):
         newpts, newbankpts = update_points(newnum, node.pts, node.bankpts)
         child_node = Node(newnum, newpts, newbankpts, depth)
         node.add_child(child_node)
-        game_tree(child_node, depth + 1, maxdepth)
+        nodes.append(child_node)
+        print(nodes)
+        game_tree(child_node, depth + 3, maxdepth)
+    return nodes
 
 
 def choose_next_node(num, pts, bankpts, depth=0):
-    nodes = []
     root = Node(num, pts, bankpts, depth)
-    game_tree (root, 0)
+    nodes = game_tree (root, 0)
+    for node in nodes:
+        print(node.num, node.pts, node.bankpts, node.depth)
     # Justin and Anastasia task
     # call this block recursively to generate game tree nodes till depth level 5
     #divisors = check_possible_divisors(num)
@@ -61,6 +84,7 @@ def choose_next_node(num, pts, bankpts, depth=0):
         #picked_node = hef(nodes)
     return root
 
+choose_next_node(12, -1, 1)
 
 def hef(nodes):
     # abs(pts) + abs(bankpts) + numberofdivisors = odd - first players wins
@@ -69,24 +93,6 @@ def hef(nodes):
     # for now first node is returned
     return nodes[0]
 
-
-class Node():
-    def __init__(self, num, pts, bankpts, depth, value=0):
-        self.num = num
-        self.pts = pts
-        self.bankpts = bankpts
-        self.value = value
-        self.depth = depth
-        self.parents = []
-        self.children = []
-
-    # function which adds parent to already generated node
-    def add_parent(self, parent):
-        self.parents.append(parent)
-
-    # function which adds child to already generated node
-    def add_child(self, child):
-        self.children.append(child)
 
 # Hasan, you need to complete this algorithm
 # As input, only bottom level nodes have heuristic values,
@@ -98,6 +104,6 @@ def minimax(nodes):
 
 
 
-choose_next_node(60,0,0)
+
 
 
