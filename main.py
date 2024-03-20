@@ -30,21 +30,36 @@ def update_points(num, pts, bankpts):
         bankpts += 1
     return pts, bankpts
 
-def choose_next_node(num, pts, bankpts):
+#crea
+def game_tree (node, depth, maxdepth=5):
+    if depth >= maxdepth:
+        return
+    divisors = check_possible_divisors(node.num)
+    for d in divisors:
+        newnum = node.num // d
+        newpts, newbankpts = update_points(newnum, node.pts, node.bankpts)
+        child_node = Node(newnum, newpts, newbankpts, depth)
+        node.add_child(child_node)
+        game_tree(child_node, depth + 1, maxdepth)
+
+
+def choose_next_node(num, pts, bankpts, depth=0):
     nodes = []
+    root = Node(num, pts, bankpts, depth)
+    game_tree (root, 0)
     # Justin and Anastasia task
     # call this block recursively to generate game tree nodes till depth level 5
-    divisors = check_possible_divisors(num)
-    for d in divisors:
-        newnum = num // d
-        newpts, newbankpts = update_points(newnum, pts, bankpts)
-        nodes.append(Node(newnum, newpts, newbankpts))
+    #divisors = check_possible_divisors(num)
+    #for d in divisors:
+        #newnum = num // d
+        #newpts, newbankpts = update_points(newnum, pts, bankpts)
+        #nodes.append(Node(newnum, newpts, newbankpts))
 
-    if not nodes:
-        return 0
-    else:
-        picked_node = hef(nodes)
-    return picked_node
+    #if not nodes:
+        #return 0
+    #else:
+        #picked_node = hef(nodes)
+    return root
 
 
 def hef(nodes):
