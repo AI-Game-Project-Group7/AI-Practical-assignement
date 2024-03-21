@@ -48,8 +48,9 @@ def update_points(num, pts, bankpts):
         bankpts += 1
     return pts, bankpts
 
-#crea
-nodes = []
+# functions to generate the game tree
+'''The creation of the list 'nodes' is only meant for helping debugging and we could consider to delete it later.'''
+nodes = [] # for display
 def game_tree (node, depth, maxdepth=5):
     if depth >= maxdepth:
         return
@@ -57,34 +58,29 @@ def game_tree (node, depth, maxdepth=5):
     for d in divisors:
         newnum = node.num // d
         newpts, newbankpts = update_points(newnum, node.pts, node.bankpts)
-        child_node = Node(newnum, newpts, newbankpts, depth)
+
+        child_node = Node(newnum, newpts, newbankpts, depth + 1)
         node.add_child(child_node)
-        nodes.append(child_node)
-        print(nodes)
-        game_tree(child_node, depth + 3, maxdepth)
-    return nodes
+        nodes.append(child_node) # for display
 
+        game_tree(child_node, depth + 1, maxdepth)
+    return nodes # for display
 
+'''Depth is only useful to initalize root as a node with a depth of 0. It is not really meant to change so we could considere to delete it and only put values of 0 for the creation 
+of root. 
+However, if we want to change the depth of root, we can keep this implementation like that.'''
 def choose_next_node(num, pts, bankpts, depth=0):
     root = Node(num, pts, bankpts, depth)
-    nodes = game_tree (root, 0)
-    for node in nodes:
-        print(node.num, node.pts, node.bankpts, node.depth)
-    # Justin and Anastasia task
-    # call this block recursively to generate game tree nodes till depth level 5
-    #divisors = check_possible_divisors(num)
-    #for d in divisors:
-        #newnum = num // d
-        #newpts, newbankpts = update_points(newnum, pts, bankpts)
-        #nodes.append(Node(newnum, newpts, newbankpts))
+    nodes = game_tree (root, depth)
 
-    #if not nodes:
-        #return 0
-    #else:
-        #picked_node = hef(nodes)
+    print(root.num, root.pts, root.bankpts, root.depth)
+
+    for node in nodes: # for display
+        print(node.num, node.pts, node.bankpts, node.depth) # for display
+
     return root
 
-choose_next_node(12, -1, 1)
+choose_next_node(5000, -1, 1)
 
 def hef(nodes):
     # abs(pts) + abs(bankpts) + numberofdivisors = odd - first players wins
