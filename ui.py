@@ -2,7 +2,7 @@ import sys
 import time
 from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QWidget, QStackedWidget
-from PyQt5.QtGui import QFont
+from PyQt5.QtGui import QFont, QIcon
 from main import *
 from state import State
 
@@ -19,6 +19,7 @@ class Window(QMainWindow):
         self.stacked_widget.addWidget(self.gamescreen)
         self.stacked_widget.addWidget(self.endscreen)
         self.setCentralWidget(self.stacked_widget)
+        self.setStyleSheet("background-color: lightgrey;")
         self.setGeometry(500, 200, 600, 500)
         self.setWindowTitle("Game demonstration")
         self.show()
@@ -36,22 +37,33 @@ class StartScreen(QWidget):
         self.label.setGeometry(150, 50, 350, 50)
         self.label.setFont(QFont('Arial', 20))
         self.startbutton = QPushButton("Start", self)
-        self.startbutton.setGeometry(200, 300, 200, 80)
+        self.startbutton.setGeometry(350, 300, 200, 80)
+        self.startbutton.setFont(QFont('Arial', 25))
+        self.startbutton.setStyleSheet("background-color: lightgreen;")
         self.startbutton.clicked.connect(self.on_startbutton_click)
+        # two additional menus should be added: who goes first -
+        # user or computer, and which algorithm is used - minimax or alpha beta
         self.init_dynamic_attributes()
 
     def init_dynamic_attributes(self):
         self.chosen_number = 0
         self.numbers = generate_randoms()
-
+        self.buttons = []
         # Add 5 buttons with numbers to choose from
         for i in range(len(self.numbers)):
             self.button = QPushButton(str(self.numbers[i]), self)
+            self.button.setFont(QFont('Arial', 16))
             self.button.setGeometry(30 + 110 * i, 150, 100, 40)
+            self.button.setStyleSheet("background-color: yellow;"
+                                      "border: 1px solid")
+            self.buttons.append(self.button)
             self.button.clicked.connect(lambda _, index=i: self.on_numbutton_click(index))
 
 
     def on_numbutton_click(self, i):
+        for button in self.buttons:
+            button.setStyleSheet("background-color: yellow;")
+        self.buttons[i].setStyleSheet("background-color: lightgreen;")
         self.chosen_number = self.numbers[i]
         state.num = self.chosen_number
 
