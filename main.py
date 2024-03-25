@@ -99,7 +99,96 @@ def minimax(nodes):
     pass
 
 
+'''Return the root node of the state space graph with heuristic values, including root.
+For this algorithm, we will do systematically MAX layer for even depth and MIN layer for odd depth.'''
+def alpha_beta(root):
+    if root.children == []:
+        return root
+
+    node = root
+
+    # Going into the leaf node with a Depth-First Search
+    while node.children != []:
+        node = node.children[0]
+
+    node.value = hef(node) # Problem currently if a node has genuinely a value of 0 (tie)
+
+    while root.value == 0:
+        first_parent = node.parents[0]
+        
+        if len(first_parent.children) == 1:
+            node = first_parent
+            node.value = node.children[0].value
+        else:
+            if children_are_scanned(first_parent):
+                compute_parent_value(first_parent)
+                node = first_parent
+            else:
+                if first_parent.value == 0 and first_parent.depth % 2 == 0: # MAX
+                    first_parent.value == 2 # Equivalent to >= 1, TO_CHANGE
+                else: # MIN
+                    first_parent.value == -2 # Equivalent to <= 1, TO_CHANGE
+
+                # alpha-beta condition
+                if first_parent.parent != [] and first_parent.parent.value != 0: # TO_CHANGE, Compare the value of the parent node with the grand-parent one
+                    ## TO-DO
 
 
+                else:
+                    node = next_children(first_parent)
+                    # Si c'est une valeur, lui assigner une valeur fixe
+                    if node.children != []:
+                        while node.children != []:
+                            node = node.children[0]
+
+                    node.value = hef(node) # Problem currently if a node has genuinely a value of 0 (tie)
+
+    return root
+
+
+'''Return true if all direct children have a value, false otherwise'''
+def children_are_scanned(node):
+    if node == [] or node.children == []:
+        return True
+    
+    i = 0
+    while node.children[i].value != 0 and i < len(node.children):
+        i += 1
+
+    if i >= len(node.children):
+        return True
+    
+    return False
+
+'''Calculate the value of a parent depending of all his children and MIN-MAX level'''
+def compute_parent_value(parent):
+    if parent == [] or parent.children == []:
+        return 0
+
+    parent.value = 0
+    if parent.depth % 2 == 0: # MAX
+        for child in parent.children:
+            if child.value >= parent.value:
+                parent.value = child.value
+
+    else:   # MIN
+        for child in parent.children:
+            if child.value <= parent.value:
+                parent.value = child.value
+
+'''Return a child that has not been evaluated yet'''
+def next_children(parent):
+    if parent.children == []:
+        return 0
+
+    ## Searching for the next node to evaluate
+    i = 0
+    while parent.children[i].value != 0 and i < len(parent.children):
+        i += 1
+    
+    if i >= len(parent.children):
+        return 0
+
+    return parent.children[i]
 
 
