@@ -92,17 +92,17 @@ class GameScreen(QWidget):
 
         # Points
         self.plabel = QLabel("points : " + str(state.pts), self)
-        self.plabel.setGeometry(150, 50 + 25, 350, 50)
+        self.plabel.setGeometry(150, 100, 350, 50)
         self.plabel.setFont(QFont('Arial', 20))
 
         # Bankpoints
         self.blabel = QLabel("bankpoints : " + str(state.bankpts), self)
-        self.blabel.setGeometry(150, 50 + 50, 350, 50)
+        self.blabel.setGeometry(150, 150, 350, 50)
         self.blabel.setFont(QFont('Arial', 20))
 
         # Player
         self.label = QLabel("player turn", self)
-        self.label.setGeometry(150, 50 + 200, 350, 50)
+        self.label.setGeometry(150, 250, 350, 50)
         self.label.setFont(QFont('Arial', 20))
 
     def start(self):
@@ -147,6 +147,7 @@ class GameScreen(QWidget):
         for div in divisors:
             self.divbutton = QPushButton(str(div), self)
             self.divbutton.setGeometry(400, 50 + 50 * div, 80, 30)
+            self.divbutton.setStyleSheet("background-color: yellow;")
             self.divbutton.clicked.connect(lambda _, index=div: self.on_divbutton_clicked(index))
             self.divbuttons.append(self.divbutton)
             self.divbutton.show()
@@ -183,8 +184,15 @@ class EndScreen(QWidget):
         super().__init__()
         self.stacked_widget = stacked_widget
         newgamebutton = QPushButton("New game", self)
-        newgamebutton.setGeometry(200, 300, 200, 80)
+        newgamebutton.setGeometry(200, 230, 200, 80)
+        newgamebutton.setFont(QFont('Arial', 25))
+        newgamebutton.setStyleSheet("background-color: lightgreen;")
         newgamebutton.clicked.connect(lambda: self.newGame())
+        quitbutton = QPushButton("Restart", self)
+        quitbutton.setGeometry(200, 350, 200, 80)
+        quitbutton.setFont(QFont('Arial', 25))
+        quitbutton.setStyleSheet("background-color: red;")
+        quitbutton.clicked.connect(lambda: sys.exit())
 
         self.qlabel = QLabel("", self)
     

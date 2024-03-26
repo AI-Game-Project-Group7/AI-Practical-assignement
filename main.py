@@ -132,6 +132,7 @@ def alpha_beta(root):
                 # alpha-beta condition
                 if first_parent.parent != [] and first_parent.parent.value != 0: # TO_CHANGE, Compare the value of the parent node with the grand-parent one
                     ## TO-DO
+                    pass
 
 
                 else:
