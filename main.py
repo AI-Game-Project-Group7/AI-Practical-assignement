@@ -119,8 +119,7 @@ def alpha_beta(root):
 
     print("Let's search this root value !")
     while root.value == 0 or root.sign != 0:
-        time.sleep(2)
-        node.display_node()
+        node.display_node() # Display
 
         first_parent = node.parents[0]
         
@@ -129,26 +128,25 @@ def alpha_beta(root):
             node.value = node.children[0].value
         else:
             if children_are_scanned(first_parent):
-                print("Computing real value for my parent", first_parent.num, " and switching for him !")
+                print("Computing real value for my parent", first_parent.num, "and switching for him !")
                 compute_parent_value(first_parent)
                 node = first_parent
             else:
                 if first_parent.value == 0 and first_parent.depth % 2 == 0: # MAX
                     first_parent.sign = 1
                     first_parent.value = node.value
-                    print("Computing MAX temporary value to the node : ", first_parent.num)
+                    print("Computing MAX temporary value to the node :", first_parent.num)
                 else: # MIN
                     first_parent.sign = -1
                     first_parent.value = node.value
-                    print("Computing MIN temporary value to the node : ", first_parent.num)
-
+                    print("Computing MIN temporary value to the node :", first_parent.num)
 
                 # alpha-beta condition
                 if first_parent != root:
                     grand_parent = first_parent.parents[0]
                     if first_parent.parents != [] and grand_parent.sign != 0: # If the grand-parent has a temporary value with < or >
                         if need_alpha_beta_cut(first_parent, grand_parent):
-                            print("Elagage !")
+                            print("alpha-beta cut !")
                             first_parent.sign = 0
                             first_parent.value = node.value
                             node = first_parent
@@ -163,7 +161,6 @@ def alpha_beta(root):
                 else:
                     node = next_children(first_parent)
         
-
     return root
 
 
@@ -231,7 +228,7 @@ def need_alpha_beta_cut(first_parent, grand_parent):
     return False
 
 
-root = choose_next_node(32, -1, 1)
+root = choose_next_node(20055, -1, 1)
 root = alpha_beta(root)
 
 print(root.value)
