@@ -154,6 +154,7 @@ def alpha_beta(root):
                         else:
                             node = next_children(first_parent)
 
+
                     else:
                         node = next_children(first_parent)
                         # Si c'est une valeur, lui assigner une valeur fixe
