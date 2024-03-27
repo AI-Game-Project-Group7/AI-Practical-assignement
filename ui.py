@@ -1,7 +1,7 @@
 import sys
 import time
 from PyQt5.QtCore import QTimer
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QWidget, QStackedWidget
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QWidget, QStackedWidget, QButtonGroup, QRadioButton
 from PyQt5.QtGui import QFont, QIcon
 from main import *
 from state import State
@@ -36,6 +36,30 @@ class StartScreen(QWidget):
         self.label = QLabel("Choose a starting number", self)
         self.label.setGeometry(150, 50, 350, 50)
         self.label.setFont(QFont('Arial', 20))
+        self.label2 = QLabel("Choose who goes first", self)
+        self.label2.setGeometry(50, 220, 350, 50)
+        self.label2.setFont(QFont('Arial', 16))
+        self.rb1 = QRadioButton("User", self)
+        self.rb1.move(60, 270)
+        self.rb1.setFont(QFont('Arial', 12))
+        self.rb2 = QRadioButton("Computer", self)
+        self.rb2.move(130, 270)
+        self.rb2.setFont(QFont('Arial', 12))
+        self.group_firstmove = QButtonGroup(self)
+        self.group_firstmove.addButton(self.rb1)
+        self.group_firstmove.addButton(self.rb2)
+        self.label3 = QLabel("Choose an algorithm", self)
+        self.label3.setGeometry(50, 350, 350, 50)
+        self.label3.setFont(QFont('Arial', 16))
+        self.rb3 = QRadioButton("Minimax", self)
+        self.rb3.move(60, 400)
+        self.rb3.setFont(QFont('Arial', 12))
+        self.rb4 = QRadioButton("Alpha-Beta", self)
+        self.rb4.move(150, 400)
+        self.rb4.setFont(QFont('Arial', 12))
+        self.group_algorithm = QButtonGroup(self)
+        self.group_algorithm.addButton(self.rb3)
+        self.group_algorithm.addButton(self.rb4)
         self.startbutton = QPushButton("Start", self)
         self.startbutton.setGeometry(350, 300, 200, 80)
         self.startbutton.setFont(QFont('Arial', 25))
@@ -68,7 +92,14 @@ class StartScreen(QWidget):
         state.num = self.chosen_number
 
     def on_startbutton_click(self):
-        if self.chosen_number:
+        print(self.group_algorithm.checkedId())
+        print(self.group_firstmove.checkedButton())
+        checked_firstmove = self.group_firstmove.checkedButton()
+        checked_algorithm = self.group_algorithm.checkedButton()
+        if self.chosen_number and checked_firstmove and checked_algorithm:
+            gamescreen = self.stacked_widget.widget(1)
+            gamescreen.starts = checked_firstmove.text()
+            gamescreen.algorithm = checked_algorithm.text()
             self.stacked_widget.setCurrentIndex(1)
             self.gamescreen.start()
         else:
@@ -82,7 +113,8 @@ class GameScreen(QWidget):
         super().__init__()
         self.stacked_widget = stacked_widget
         self.running = True
-        self.starts = "p"
+        self.starts = "User"
+        self.algorithm = "Minimax"
         
         '''Adding text about num, points, bankpoints and player currently playing.'''
         # Num
@@ -106,7 +138,7 @@ class GameScreen(QWidget):
         self.label.setFont(QFont('Arial', 20))
 
     def start(self):
-        if self.starts == "p":
+        if self.starts == "User":
             self.player_move()
         else:
             self.computer_move()
