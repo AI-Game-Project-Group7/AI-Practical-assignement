@@ -21,7 +21,7 @@ class Node():
         self.children.append(child)
 
     def display_node(self):
-        print()
+        print("Num : ", self.num, "Pts : ", self.pts, "Value : ", self.value, "Sign : ", self.sign, "Depth : ", self.depth)
 
 # function to generate 5 numbers in a range from 30000 to 50000
 def generate_randoms(low=30000, high=50000, quantity=5):
@@ -79,10 +79,10 @@ def choose_next_node(num, pts, bankpts, depth=0):
     root = Node(num, pts, bankpts, depth)
     nodes = game_tree (root, depth)
 
-    print(root.num, root.pts, root.bankpts, root.depth)
+    root.display_node()
 
     for node in nodes: # for display
-        print(node.num, node.pts, node.bankpts, node.depth) # for display
+        node.display_node()
 
     return root
 
@@ -115,12 +115,13 @@ def alpha_beta(root):
     while node.children != []:
         node = node.children[0]
 
-    print("First node ! ", node.value)
     node.value = -1 # Put heuristic function here
 
-    while root.value == 0:
+    print("Let's search this root value !")
+    while root.value == 0 or root.sign != 0:
         time.sleep(2)
-        print("This is the node : ", node.num)
+        node.display_node()
+
         first_parent = node.parents[0]
         
         if len(first_parent.children) == 1:
@@ -154,13 +155,9 @@ def alpha_beta(root):
                         else:
                             node = next_children(first_parent)
 
-
                     else:
                         node = next_children(first_parent)
-                        # Si c'est une valeur, lui assigner une valeur fixe
-                        if node.children != []:
-                            while node.children != []:
-                                node = node.children[0]
+                        
 
                         node.value = -1 # Put heuristic function here
                 else:
@@ -189,7 +186,7 @@ def compute_parent_value(parent):
     if parent == [] or parent.children == []:
         return 0
 
-    parent.value = 0
+    parent.value = parent.children[0].value
     if parent.depth % 2 == 0: # MAX
         for child in parent.children:
             if child.value >= parent.value:
@@ -199,6 +196,7 @@ def compute_parent_value(parent):
         for child in parent.children:
             if child.value <= parent.value:
                 parent.value = child.value
+    parent.sign = 0
 
 '''Return a child that has not been evaluated yet'''
 def next_children(parent):
@@ -213,14 +211,22 @@ def next_children(parent):
     if i >= len(parent.children):
         return 0
 
-    return parent.children[i]
+    node = parent.children[i]
+
+    while node.children != []:
+        node = node.children[0]
+
+    node.value = -1 # Put heuristic function here
+    
+
+    return node
 
 def need_alpha_beta_cut(first_parent, grand_parent):
     if grand_parent.depth % 2 == 0: # First_parent is at MIN, grand_parent is at MAX
-        if parent.value <= grand_parent.value:
+        if first_parent.value <= grand_parent.value:
             return True
     else: # First_parent is at MAX, grand_parent is at MIN
-        if parent.value >= grand_parent.value:
+        if first_parent.value >= grand_parent.value:
             return True
     return False
 
