@@ -1,4 +1,5 @@
 from random import randint
+import time
 
 class Node():
     def __init__(self, num, pts, bankpts, depth, value=0):
@@ -6,6 +7,7 @@ class Node():
         self.pts = pts
         self.bankpts = bankpts
         self.value = value
+        self.sign = 0 # 1 is >=, -1 is <=
         self.depth = depth
         self.parents = []
         self.children = []
@@ -17,6 +19,9 @@ class Node():
     # function which adds child to already generated node
     def add_child(self, child):
         self.children.append(child)
+
+    def display_node(self):
+        print()
 
 # function to generate 5 numbers in a range from 30000 to 50000
 def generate_randoms(low=30000, high=50000, quantity=5):
@@ -61,6 +66,7 @@ def game_tree (node, depth, maxdepth=5):
 
         child_node = Node(newnum, newpts, newbankpts, depth + 1)
         node.add_child(child_node)
+        child_node.add_parent(node)
         nodes.append(child_node) # for display
 
         game_tree(child_node, depth + 1, maxdepth)
@@ -79,8 +85,6 @@ def choose_next_node(num, pts, bankpts, depth=0):
         print(node.num, node.pts, node.bankpts, node.depth) # for display
 
     return root
-
-choose_next_node(5000, -1, 1)
 
 def hef(nodes):
     # abs(pts) + abs(bankpts) + numberofdivisors = odd - first players wins
@@ -111,9 +115,12 @@ def alpha_beta(root):
     while node.children != []:
         node = node.children[0]
 
-    node.value = hef(node) # Problem currently if a node has genuinely a value of 0 (tie)
+    print("First node ! ", node.value)
+    node.value = -1 # Put heuristic function here
 
     while root.value == 0:
+        time.sleep(2)
+        print("This is the node : ", node.num)
         first_parent = node.parents[0]
         
         if len(first_parent.children) == 1:
@@ -121,27 +128,43 @@ def alpha_beta(root):
             node.value = node.children[0].value
         else:
             if children_are_scanned(first_parent):
+                print("Computing real value for my parent", first_parent.num, " and switching for him !")
                 compute_parent_value(first_parent)
                 node = first_parent
             else:
                 if first_parent.value == 0 and first_parent.depth % 2 == 0: # MAX
-                    first_parent.value == 2 # Equivalent to >= 1, TO_CHANGE
+                    first_parent.sign = 1
+                    first_parent.value = node.value
+                    print("Computing MAX temporary value to the node : ", first_parent.num)
                 else: # MIN
-                    first_parent.value == -2 # Equivalent to <= 1, TO_CHANGE
+                    first_parent.sign = -1
+                    first_parent.value = node.value
+                    print("Computing MIN temporary value to the node : ", first_parent.num)
+
 
                 # alpha-beta condition
-                if first_parent.parent != [] and first_parent.parent.value != 0: # TO_CHANGE, Compare the value of the parent node with the grand-parent one
-                    ## TO-DO
+                if first_parent != root:
+                    grand_parent = first_parent.parents[0]
+                    if first_parent.parents != [] and grand_parent.sign != 0: # If the grand-parent has a temporary value with < or >
+                        if need_alpha_beta_cut(first_parent, grand_parent):
+                            print("Elagage !")
+                            first_parent.sign = 0
+                            first_parent.value = node.value
+                            node = first_parent
+                        else:
+                            node = next_children(first_parent)
 
+                    else:
+                        node = next_children(first_parent)
+                        # Si c'est une valeur, lui assigner une valeur fixe
+                        if node.children != []:
+                            while node.children != []:
+                                node = node.children[0]
 
+                        node.value = -1 # Put heuristic function here
                 else:
                     node = next_children(first_parent)
-                    # Si c'est une valeur, lui assigner une valeur fixe
-                    if node.children != []:
-                        while node.children != []:
-                            node = node.children[0]
-
-                    node.value = hef(node) # Problem currently if a node has genuinely a value of 0 (tie)
+        
 
     return root
 
@@ -152,7 +175,7 @@ def children_are_scanned(node):
         return True
     
     i = 0
-    while node.children[i].value != 0 and i < len(node.children):
+    while i < len(node.children) and node.children[i].value != 0:
         i += 1
 
     if i >= len(node.children):
@@ -183,7 +206,7 @@ def next_children(parent):
 
     ## Searching for the next node to evaluate
     i = 0
-    while parent.children[i].value != 0 and i < len(parent.children):
+    while i < len(parent.children) and parent.children[i].value != 0:
         i += 1
     
     if i >= len(parent.children):
@@ -191,4 +214,17 @@ def next_children(parent):
 
     return parent.children[i]
 
+def need_alpha_beta_cut(first_parent, grand_parent):
+    if grand_parent.depth % 2 == 0: # First_parent is at MIN, grand_parent is at MAX
+        if parent.value <= grand_parent.value:
+            return True
+    else: # First_parent is at MAX, grand_parent is at MIN
+        if parent.value >= grand_parent.value:
+            return True
+    return False
 
+
+root = choose_next_node(32, -1, 1)
+root = alpha_beta(root)
+
+print(root.value)
