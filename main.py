@@ -86,12 +86,16 @@ def choose_next_node(num, pts, bankpts, depth=0):
 
     return root
 
-def hef(nodes):
+def hef(node):
+    if node.pts + node.bankpts + check_possible_divisors(node.num) % 2 == 0:
+        value = -1
+    else:
+        value = 1
     # abs(pts) + abs(bankpts) + numberofdivisors = odd - first players wins
     # abs(pts) + abs(bankpts) + numberofdivisors  = even - second player wins
     # insert heuristic evaluation function here
     # for now first node is returned
-    return nodes[0]
+    return value
 
 
 # Hasan, you need to complete this algorithm
@@ -157,7 +161,7 @@ def alpha_beta(root):
                         node = next_children(first_parent)
                         
 
-                        node.value = -1 # Put heuristic function here
+                        node.value = hef(node)
                 else:
                     node = next_children(first_parent)
         
@@ -213,7 +217,7 @@ def next_children(parent):
     while node.children != []:
         node = node.children[0]
 
-    node.value = -1 # Put heuristic function here
+    node.value = hef(node)
     
 
     return node
