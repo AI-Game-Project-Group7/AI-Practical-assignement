@@ -87,7 +87,7 @@ def choose_next_node(num, pts, bankpts, depth=0):
     return root
 
 def hef(node):
-    if node.pts + node.bankpts + check_possible_divisors(node.num) % 2 == 0:
+    if (node.pts + node.bankpts + len(check_possible_divisors(node.num))) % 2 == 0:
         value = -1
     else:
         value = 1
