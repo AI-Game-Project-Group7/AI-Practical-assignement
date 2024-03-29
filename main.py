@@ -119,7 +119,7 @@ def alpha_beta(root):
     while node.children != []:
         node = node.children[0]
 
-    node.value = -1 # Put heuristic function here
+    node.value = hef(node)
 
     print("Let's search this root value !")
     while root.value == 0 or root.sign != 0:
@@ -160,8 +160,6 @@ def alpha_beta(root):
                     else:
                         node = next_children(first_parent)
                         
-
-                        node.value = hef(node)
                 else:
                     node = next_children(first_parent)
         
