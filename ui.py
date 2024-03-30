@@ -114,7 +114,8 @@ class GameScreen(QWidget):
         self.stacked_widget = stacked_widget
         self.running = True
         self.starts = "User"
-        self.algorithm = "Minimax"
+        self.root = alpha_beta(make_tree(state.num, state.pts, state.bankpts)) # Creating the alpha-beta tree
+        self.node = self.root
         
         '''Adding text about num, points, bankpoints and player currently playing.'''
         # Num
@@ -149,7 +150,8 @@ class GameScreen(QWidget):
         self.update_divisors()
 
     def computer_move(self):
-        node = choose_next_node(state.num, state.pts, state.bankpts)
+        node = choose_next_node(self.node)
+        self.node = node
         if not node:
             self.who_wins()
             self.stacked_widget.setCurrentIndex(2)

@@ -75,7 +75,7 @@ def game_tree (node, depth, maxdepth=5):
 '''Depth is only useful to initalize root as a node with a depth of 0. It is not really meant to change so we could considere to delete it and only put values of 0 for the creation 
 of root. 
 However, if we want to change the depth of root, we can keep this implementation like that.'''
-def choose_next_node(num, pts, bankpts, depth=0):
+def make_tree(num, pts, bankpts, depth=0):
     root = Node(num, pts, bankpts, depth)
     nodes = game_tree (root, depth)
 
@@ -85,6 +85,14 @@ def choose_next_node(num, pts, bankpts, depth=0):
         node.display_node()
 
     return root
+
+def choose_next_node(actual_node):
+    for child in actual_node.children:
+        if child.value == actual_node.value:
+            return child
+    return []
+    
+
 
 def hef(node):
     if (node.pts + node.bankpts + len(check_possible_divisors(node.num))) % 2 == 0:
@@ -229,8 +237,8 @@ def need_alpha_beta_cut(first_parent, grand_parent):
             return True
     return False
 
+if __name__ == "__main__":
+    root = make_tree(32962, -1, 1)
+    root = alpha_beta(root)
 
-root = choose_next_node(20055, -1, 1)
-root = alpha_beta(root)
-
-print(root.value)
+    print(root.value)
