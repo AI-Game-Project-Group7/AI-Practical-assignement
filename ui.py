@@ -113,9 +113,8 @@ class GameScreen(QWidget):
         super().__init__()
         self.stacked_widget = stacked_widget
         self.running = True
+        self.algorithm = "Alpha-Beta"
         self.starts = "User"
-        self.root = alpha_beta(make_tree(state.num, state.pts, state.bankpts)) # Creating the alpha-beta tree
-        self.node = self.root
         
         '''Adding text about num, points, bankpoints and player currently playing.'''
         # Num
@@ -142,7 +141,11 @@ class GameScreen(QWidget):
         if self.starts == "User":
             self.player_move()
         else:
-            self.computer_move()
+            self.label.setText("computer turn")
+            self.update_labels()
+            self.update_divisors()
+            QTimer.singleShot(3000, self.computer_move)
+            #self.computer_move()
 
     def player_move(self):
         self.label.setText("player turn")
@@ -150,6 +153,11 @@ class GameScreen(QWidget):
         self.update_divisors()
 
     def computer_move(self):
+        if self.algorithm == "Alpha-Beta":
+            self.node = alpha_beta(make_tree(state.num, state.pts, state.bankpts))
+        elif self.algorithm == "Minimax":
+            # self.node = insert minimax algorithm here
+            pass
         node = choose_next_node(self.node)
         self.node = node
         if not node:
@@ -222,7 +230,7 @@ class EndScreen(QWidget):
         newgamebutton.setFont(QFont('Arial', 25))
         newgamebutton.setStyleSheet("background-color: lightgreen;")
         newgamebutton.clicked.connect(lambda: self.newGame())
-        quitbutton = QPushButton("Restart", self)
+        quitbutton = QPushButton("Quit", self)
         quitbutton.setGeometry(200, 350, 200, 80)
         quitbutton.setFont(QFont('Arial', 25))
         quitbutton.setStyleSheet("background-color: red;")
