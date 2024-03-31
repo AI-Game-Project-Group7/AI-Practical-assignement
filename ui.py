@@ -115,6 +115,7 @@ class GameScreen(QWidget):
         self.running = True
         self.algorithm = "Alpha-Beta"
         self.starts = "User"
+        self.node = []
         
         '''Adding text about num, points, bankpoints and player currently playing.'''
         # Num
@@ -138,6 +139,15 @@ class GameScreen(QWidget):
         self.label.setFont(QFont('Arial', 20))
 
     def start(self):
+        root = make_tree(state.num, state.pts, state.bankpts)
+        if self.algorithm == "Alpha-Beta":
+            self.node = alpha_beta(root)
+        elif self.algorithm == "Minimax":
+            minimax(root, True)
+            self.node = root
+            #print_tree(root) For display
+
+
         if self.starts == "User":
             self.player_move()
         else:
@@ -153,11 +163,6 @@ class GameScreen(QWidget):
         self.update_divisors()
 
     def computer_move(self):
-        if self.algorithm == "Alpha-Beta":
-            self.node = alpha_beta(make_tree(state.num, state.pts, state.bankpts))
-        elif self.algorithm == "Minimax":
-            # self.node = insert minimax algorithm here
-            pass
         node = choose_next_node(self.node)
         self.node = node
         if not node:
@@ -203,8 +208,6 @@ class GameScreen(QWidget):
 
 
     def who_wins(self):
-        print("Going through me !")
-
         endscreen = self.stacked_widget.widget(2)
         
         if (state.pts % 2) == 0:
