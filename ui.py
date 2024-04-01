@@ -134,7 +134,7 @@ class GameScreen(QWidget):
         self.blabel.setFont(QFont('Arial', 20))
 
         # Player
-        self.label = QLabel("player turn", self)
+        self.label = QLabel("user turn", self)
         self.label.setGeometry(150, 250, 350, 50)
         self.label.setFont(QFont('Arial', 20))
 
@@ -143,8 +143,8 @@ class GameScreen(QWidget):
         if self.algorithm == "Alpha-Beta":
             self.node = alpha_beta(root)
         elif self.algorithm == "Minimax":
-            minimax(root, True)
-            self.node = root
+            self.node = minimax(root, True)
+            #self.node = root
             #print_tree(root) For display
 
 
@@ -157,12 +157,14 @@ class GameScreen(QWidget):
             QTimer.singleShot(3000, self.computer_move)
             #self.computer_move()
 
+
     def player_move(self):
-        self.label.setText("player turn")
+        self.label.setText("user turn")
         self.update_labels()
         self.update_divisors()
 
     def computer_move(self):
+        self.node = self.set_current_node()
         node = choose_next_node(self.node)
         self.node = node
         if not node:
@@ -173,6 +175,15 @@ class GameScreen(QWidget):
             for db in self.divbuttons:
                 db.deleteLater()
             self.player_move()
+
+    def set_current_node(self):
+        root = make_tree(state.num, state.pts, state.bankpts)
+        if self.algorithm == "Alpha-Beta":
+            node = alpha_beta(root)
+        else:
+            minimax(root, True, starts=self.starts)
+            node = root
+        return node
 
     def on_divbutton_clicked(self, divisor):
         state.num = state.num // divisor
@@ -209,16 +220,21 @@ class GameScreen(QWidget):
 
     def who_wins(self):
         endscreen = self.stacked_widget.widget(2)
-        
         if (state.pts % 2) == 0:
             state.pts += state.bankpts
         else:
             state.pts -= state.bankpts
 
-        if (state.pts % 2) != 0: # Same as state.pts % 2 but more clear this way
-            endscreen.qlabel.setText("First player wins!")
+        if (state.pts % 2) != 0:
+            if self.starts == "Computer":
+                endscreen.qlabel.setText("Computer wins!")
+            else:
+                endscreen.qlabel.setText("User wins!")
         else:
-            endscreen.qlabel.setText("Second player wins!")
+            if self.starts == "Computer":
+                endscreen.qlabel.setText("User wins!")
+            else:
+                endscreen.qlabel.setText("Computer wins!")
         endscreen.qlabel.setGeometry(150, 50, 350, 50)
         endscreen.qlabel.setFont(QFont('Arial', 20))
 

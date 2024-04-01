@@ -94,29 +94,27 @@ def choose_next_node(actual_node):
     
 
 
-def hef(node):
-    final_pts = node.pts + node.bankpts if node.pts % 2 == 0 else node.pts - node.bankpts
-    final_score_parity = final_pts % 2  
-    node.value = 0
-    num_divisors = len(check_possible_divisors(node.num))
-
-    if final_score_parity == 1:
-        node.value += -999 
-    else: 
-        node.value += 999   
-
-    node.value += num_divisors
-    # node.value += node.depth
-
-    return node.value
+def hef(node, starts="User"):
+    if (abs(node.pts) + abs(node.bankpts) + len(check_possible_divisors(node.num))) % 2 == 1:
+        if starts == "User":
+            value = 1
+        else:
+            value = -1
+    else:
+        if starts == "User":
+            value = -1
+        else:
+            value = 1
+    return value
 
 
-def minimax(node, is_max_turn):
+
+def minimax(node, is_user_turn, starts="User"):
     if not node.children:  # If leaf node, return its heuristic value
         node.value = hef(node)
         return node.value
 
-    if is_max_turn:
+    if is_user_turn:
         # Maximizing player (human): looking for a high heuristic value
         max_eval = float('-inf')
         for child in node.children:
