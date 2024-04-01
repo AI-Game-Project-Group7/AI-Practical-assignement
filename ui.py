@@ -141,9 +141,9 @@ class GameScreen(QWidget):
     def start(self):
         root = make_tree(state.num, state.pts, state.bankpts)
         if self.algorithm == "Alpha-Beta":
-            self.node = alpha_beta(root)
+            self.node = alpha_beta(root, starts=self.starts)
         elif self.algorithm == "Minimax":
-            self.node = minimax(root, True)
+            self.node = minimax(root, True, starts=self.starts)
             #self.node = root
             #print_tree(root) For display
 
@@ -179,7 +179,7 @@ class GameScreen(QWidget):
     def set_current_node(self):
         root = make_tree(state.num, state.pts, state.bankpts)
         if self.algorithm == "Alpha-Beta":
-            node = alpha_beta(root)
+            node = alpha_beta(root, starts=self.starts)
         else:
             minimax(root, True, starts=self.starts)
             node = root

@@ -21,7 +21,7 @@ class Node():
         self.children.append(child)
 
     def display_node(self):
-        print("Num : ", self.num, "Pts : ", self.pts, "Value : ", self.value, "Sign : ", self.sign, "Depth : ", self.depth)
+        print("Num : ", self.num, "Pts : ", self.pts, "Bankpts: ", self.bankpts, "Value : ", self.value, "Sign : ", self.sign, "Depth : ", self.depth)
 
 # function to generate 5 numbers in a range from 30000 to 50000
 def generate_randoms(low=30000, high=50000, quantity=5):
@@ -95,38 +95,37 @@ def choose_next_node(actual_node):
 
 
 def hef(node, starts="User"):
+    print(starts)
     if (abs(node.pts) + abs(node.bankpts) + len(check_possible_divisors(node.num))) % 2 == 1:
         if starts == "User":
-            value = 1
-        else:
             value = -1
+        else:
+            value = 1
     else:
         if starts == "User":
-            value = -1
-        else:
             value = 1
+        else:
+            value = -1
     return value
 
-
-
-def minimax(node, is_user_turn, starts="User"):
+def minimax(node, is_computer_turn, starts="User"):
     if not node.children:  # If leaf node, return its heuristic value
-        node.value = hef(node)
+        node.value = hef(node, starts=starts)
         return node.value
 
-    if is_user_turn:
-        # Maximizing player (human): looking for a high heuristic value
+    if is_computer_turn:
+        # Maximizing player (computer): looking for a high heuristic value
         max_eval = float('-inf')
         for child in node.children:
-            eval = minimax(child, False)
+            eval = minimax(child, False, starts=starts)
             max_eval = max(max_eval, eval)
         node.value = max_eval
         return node.value
     else:
-        # Minimizing player (computer): looking for a low heuristic value
+        # Minimizing player (user): looking for a low heuristic value
         min_eval = float('inf')
         for child in node.children:
-            eval = minimax(child, True)
+            eval = minimax(child, True, starts=starts)
             min_eval = min(min_eval, eval)
         node.value = min_eval
         return node.value
@@ -142,7 +141,7 @@ def print_tree(node, level=0):
 
 '''Return the root node of the state space graph with heuristic values, including root.
 For this algorithm, we will do systematically MAX layer for even depth and MIN layer for odd depth.'''
-def alpha_beta(root):
+def alpha_beta(root, starts="User"):
     if root.children == []:
         return root
 
@@ -152,7 +151,7 @@ def alpha_beta(root):
     while node.children != []:
         node = node.children[0]
 
-    node.value = hef(node)
+    node.value = hef(node, starts=starts)
 
     print("Let's search this root value !")
     while root.value == 0 or root.sign != 0:
@@ -188,13 +187,13 @@ def alpha_beta(root):
                             first_parent.value = node.value
                             node = first_parent
                         else:
-                            node = next_children(first_parent)
+                            node = next_children(first_parent, starts)
 
                     else:
-                        node = next_children(first_parent)
+                        node = next_children(first_parent, starts)
                         
                 else:
-                    node = next_children(first_parent)
+                    node = next_children(first_parent, starts)
         
     return root
 
@@ -231,7 +230,7 @@ def compute_parent_value(parent):
     parent.sign = 0
 
 '''Return a child that has not been evaluated yet'''
-def next_children(parent):
+def next_children(parent, starts):
     if parent.children == []:
         return 0
 
@@ -248,7 +247,7 @@ def next_children(parent):
     while node.children != []:
         node = node.children[0]
 
-    node.value = hef(node)
+    node.value = hef(node, starts)
     
 
     return node
@@ -264,6 +263,6 @@ def need_alpha_beta_cut(first_parent, grand_parent):
 
 if __name__ == "__main__":
     root = make_tree(32962, -1, 1)
-    root = alpha_beta(root)
+    root = alpha_beta(root, starts="User")
 
     print(root.value)
